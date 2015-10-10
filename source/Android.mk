@@ -3,10 +3,8 @@ LOCAL_PATH:= $(call my-dir)
 include $(CLEAR_VARS)
 
 LOCAL_SRC_FILES:= \
-    multicast-client.c\
-	input.c\
-	suinput.c
+    control_wifi.c
 
-LOCAL_MODULE := hidip-device
+LOCAL_MODULE := control_wifi
 
 include $(BUILD_EXECUTABLE)
