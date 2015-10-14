@@ -1,17 +1,7 @@
-//#include"control_wifi.h"
-#include <unistd.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
+#include "control_wifi.h"
 
-#define WIFI_DRIVER_MODULE_PATH   "/system/lib/modules/wlcore_sdio.ko"
-#define SUPP_CONFIG_FILE          "/data/misc/wifi/wpa_supplicant.conf"
 
-//it  depends on  "SUPP_CONFIG_FILE" 
-#define CONTROL_IFACE_PATH	   "/data/misc/wifi/wlan0"
-#define ANDROID
 
-extern int  command_System(int argcount,const char* args[],const char* binary_name);
 
 int  command_System(int argcount,const char* args[],const char* binary_name)
 {
@@ -83,7 +73,7 @@ int connect_AP(const char* ssid,const char* psk)
 	args[2]="add_network";
 	args[3]= "0";
 
-        ret=command_System(4,args,"wpa_ci");
+        ret=command_System(4,args,"wpa_cli");
 
     	sprintf(ssid_wpa, "%s", "\"\'");
 
@@ -97,7 +87,7 @@ int connect_AP(const char* ssid,const char* psk)
 	args[3]="ssid";
 	args[4]=ssid_wpa;
 
-        ret=command_System(5,args,"wpa_ci");
+        ret=command_System(5,args,"wpa_cli");
 
         args[0]="-p";
 	args[1]=CONTROL_IFACE_PATH;
@@ -105,40 +95,31 @@ int connect_AP(const char* ssid,const char* psk)
 	args[3]="psk";
 	args[4]=psk;
 
-       ret=command_System(5,args,"wpa_ci");
+       ret=command_System(5,args,"wpa_cli");
 
    	args[0]="-p";
 	args[1]=CONTROL_IFACE_PATH;
 	args[2]="select_network";
 	args[3]="0";
 
-       ret=command_System(4,args,"wpa_ci");
+       ret=command_System(4,args,"wpa_cli");
 
    	args[0]="-p";
 	args[1]=CONTROL_IFACE_PATH;
 	args[2]="enable_network";
 	args[3]="0";
 
-       ret=command_System(4,args,"wpa_ci");
+       ret=command_System(4,args,"wpa_cli");
 
 	args[0]="wlan0";
 
-	ret=command_System(1,args,"dhpad");
+	ret=command_System(1,args,DHCP_TOOL);
 	
 
 }
 
-/*
-int Disconnect_AP(voi)
-{
-	int ret;	
-        const char* args[] = {""};
-	
-	ret=command_system(6,args,"ps");
 
 
-}
-*/
 
 #else 
 
@@ -164,48 +145,57 @@ int connect_AP(const char* ssid,const char* psk)
 
         args[]={"-iwlan0","0","ssid",ssid_wpa};
 
-        ret=command_System(4,args,"wpa_ci");
+        ret=command_System(4,args,"wpa_cli");
 
        args[]={"-iwlan0","0","psk",psk};
 
-       ret=command_System(4,args,"wpa_ci");
+       ret=command_System(4,args,"wpa_cli");
 
    	args[]={"-iwlan0","select_network","0"};
 
-       ret=command_System(3,args,"wpa_ci");
+       ret=command_System(3,args,"wpa_cli");
 
    	args[]={"-iwlan0","enable_network","0"};
 
-       ret=command_System(3,args,"wpa_ci");
+       ret=command_System(3,args,"wpa_cli");
 
 	args[]={"wlan0"};
 
-	ret=command_System(1,args,"dhpad");
+	ret=command_System(1,args,DHCP_TOOL);
 	
 }
 
 #endif
 
-int main(int argc, char *argv[])
+
+int disconnect_AP(voi)
 {
+	int ret;	
+	const char* args[] = {"-ef | grep wpa_supplicant | awk '{print $2}' | xargs kill -9"};
+	
+	ret=command_system(1,args,"ps");
 
-	turn_On_Wifi();
+	args[0]="-ef | grep  wpa_cli | awk '{print $2}' | xargs kill -9";	
 
-	usleep(3000000); 			//wait for three seconds
-	//must wait for ,because insmoding  the driver  requires three seconds
+    	ret=command_system(1,args,"ps");
 
-	search_Wifi_Spot();
+        args[0]="-ef | grep ";
+	args[1]= DHCP_TOOL;
+	args[2]="| awk '{print $2}' | xargs kill -9"; 
 
-        usleep(1000000);                  //wait for one seconds 
+	ret=command_system(3,args,"ps");
+	
+	return ret;
+}
 
-	connect_AP("Flaircomm_XM","Flaircommxiamen");	
-
-	usleep(1000000); 
-
-
-	turn_Off_Wifi();
-
-	return 0;
+int clear_AP_History(void)
+{
+	int ret;	
+	const char* args[] = {SUPP_CONFIG_FILE};
+	
+	ret=command_System(1,args,"rm -rf");
+	
+	return ret;
 }
 
 

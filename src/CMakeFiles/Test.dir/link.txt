@@ -1,0 +1,1 @@
+/usr/bin/gcc  -fPIC    -shared -Wl,-soname,libTest.so -o ../lib/libTest.so CMakeFiles/Test.dir/control_wifi.c.o 

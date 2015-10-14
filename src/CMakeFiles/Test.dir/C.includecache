@@ -1,0 +1,22 @@
+#IncludeRegexLine: ^[ 	]*#[ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/home/ubuntu/Desktop/wifi_lib/src/control_wifi.c
+control_wifi.h
+/home/ubuntu/Desktop/wifi_lib/src/control_wifi.h
+
+/home/ubuntu/Desktop/wifi_lib/src/control_wifi.h
+unistd.h
+-
+stdio.h
+-
+stdlib.h
+-
+string.h
+-
+
