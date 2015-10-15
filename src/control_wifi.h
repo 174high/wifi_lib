@@ -20,10 +20,10 @@
 
 
 
-extern int  command_System(int argcount,const char* args[],const char* binary_name);
+extern int  command_System(int argcount,const char* args[],const char* binary_name,char* returndata);
 extern int  turn_On_Wifi(void) ;
 extern int  turn_Off_Wifi(void) ;
-extern int  search_Wifi_Spot(void) ;
+extern int  search_Wifi_Spot(char * wifispot);
 extern int  connect_AP(const char* ssid,const char* psk) ;
 extern int  disconnect(void);
 extern int  clear_AP_History(void);

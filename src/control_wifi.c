@@ -1,7 +1,8 @@
 #include "control_wifi.h"
 
 
-int  command_System(int argcount,const char* args[],const char* binary_name,const char* returndata)
+
+int  command_System(int argcount,const char* args[],const char* binary_name,char* returndata)
 {
         char myoutput_array[1000];
 	int i,ret;
@@ -27,7 +28,10 @@ int  command_System(int argcount,const char* args[],const char* binary_name,cons
         while (fgets(path, sizeof(path), fp) != NULL)
         {
                 printf("%s", path);
-		strcat(returndata, path);	
+		if(returndata!=NULL)
+		{
+			strcat(returndata, path);	
+		}
         }
 
         /* close */
@@ -61,7 +65,7 @@ int search_Wifi_Spot(char * wifispot)
      
 	int  ret;
 	
-	const char* args[] = {"wlan0","up"};
+	const char* args[30] = {"wlan0","up"};
 		
 	ret=command_System(2,args,"ifconfig",NULL);
 
@@ -72,9 +76,11 @@ int search_Wifi_Spot(char * wifispot)
 	args[4] = "-e WPA  -e WEP" ;
 	args[5] = "-e Group  -e Pairwise -e Authentication ";
 	
-	
-        ret=command_System(2,args,"iw",wifispot);
+	printf("---here----\r\n");
 
+        ret=command_System(6,args,"iw",wifispot);
+
+	printf("-----here---\r\n");
         return ret;
 }
 
@@ -84,7 +90,7 @@ int search_Wifi_Spot(char * wifispot)
 int connect_AP(const char* ssid,const char* psk)
 {
 	int  ret;
-	char* ssid_wpa;
+	char ssid_wpa[100];
 	const char* args[] = {"-d","-Dnl80211","-c",SUPP_CONFIG_FILE,"-iwlan0","-B"};
 
 
@@ -135,9 +141,9 @@ int connect_AP(const char* ssid,const char* psk)
 
 	args[0]="wlan0";
 
-	ret=command_System(1,args,DHCP_TOOL);
+	ret=command_System(1,args,DHCP_TOOL,NULL);
 	
-
+	return ret;
 }
 
 
@@ -149,8 +155,8 @@ int connect_AP(const char* ssid,const char* psk)
 
 int connect_AP(const char* ssid,const char* psk)
 {
-        const char* args[] = {"-d","-Dnl80211","-c",SUPP_CONFIG_FILE,"-iwlan0","-B"};
-	char* ssid_wpa;
+        const char* args[30] = {"-d","-Dnl80211","-c",SUPP_CONFIG_FILE,"-iwlan0","-B"};
+	char ssid_wpa[100];
 	
 
         ret=command_System(6,args,"wpa_supplicant",NULL);
@@ -193,7 +199,7 @@ int connect_AP(const char* ssid,const char* psk)
 int disconnect_AP(voi)
 {
 	int ret;	
-	const char* args[] = {"-ef | grep wpa_supplicant | awk '{print $2}' | xargs kill -9"};
+	const char* args[30] = {"-ef | grep wpa_supplicant | awk '{print $2}' | xargs kill -9"};
 	
 	ret=command_System(1,args,"ps",NULL);
 

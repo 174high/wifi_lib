@@ -1,1 +1,1 @@
-/usr/bin/gcc      CMakeFiles/main.dir/main.c.o  -o bin/main -rdynamic -L/home/ubuntu/Desktop/wifi_lib/lib lib/libTest.so -Wl,-rpath,/home/ubuntu/Desktop/wifi_lib/lib 
+/usr/bin/gcc  -g -Wall    CMakeFiles/main.dir/main.c.o  -o bin/main -rdynamic -L/home/ubuntu/Desktop/wifi_lib/lib lib/libTest.so -Wl,-rpath,/home/ubuntu/Desktop/wifi_lib/lib 
