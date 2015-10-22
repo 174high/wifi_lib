@@ -16,27 +16,30 @@ int  command_System(int argcount,const char* args[],const char* binary_name,char
                 strcat(myoutput_array, args[i]);
         }
 
-        /* Open the command for reading. */
-        fp = popen(myoutput_array, "r");
-        if (fp == NULL)
-        {
-                printf("Failed to run command\n" );
-                exit(1);
-        }
+	if(returndata==NULL)
+	{
+		 ret=system(myoutput_array);
+	}
+	else
+	{
+        	/* Open the command for reading. */
+        	fp = popen(myoutput_array, "r");
+        	if (fp == NULL)
+       		{
+                	printf("Failed to run command\n" );
+                	exit(1);
+       		 }
 
-        /* Read the output a line at a time - output it. */
-        while (fgets(path, sizeof(path), fp) != NULL)
-        {
-                printf("%s", path);
-		if(returndata!=NULL)
-		{
-			strcat(returndata, path);	
-		}
-        }
+        	/* Read the output a line at a time - output it. */
+        	while (fgets(path, sizeof(path), fp) != NULL)
+        	{
+                	printf("%s", path);
+			strcat(returndata, path);
+        	}
 
-        /* close */
-        pclose(fp);
-
+        	/* close */
+        	pclose(fp);
+	}
         return ret;
 }
 
@@ -76,72 +79,177 @@ int search_Wifi_Spot(char * wifispot)
 	args[4] = "-e WPA  -e WEP" ;
 	args[5] = "-e Group  -e Pairwise -e Authentication ";
 	
-	printf("---here----\r\n");
 
         ret=command_System(6,args,"iw",wifispot);
 
-	printf("-----here---\r\n");
         return ret;
 }
 
 
 #ifdef ANDROID
-  //andoid 
+  //andoid
+
+int connect_AP_Open(const char*ssid)
+{
+      	int  ret;
+        const char* args[] = {"-d","-Dnl80211","-c",SUPP_CONFIG_FILE,"-iwlan0","-B"};
+
+        printf("---wpa_supplicant---\r\n");
+        ret=command_System(6,args,"wpa_supplicant",NULL);
+
+        args[0]="-p";
+        args[1]= CONTROL_IFACE_PATH;
+        args[2]="add_network";
+        args[3]= "2";
+
+        printf("---wpa_cli_add_network---\r\n");
+        ret=command_System(4,args,"wpa_cli",NULL);
+
+      	args[0]="-p";
+        args[1]=CONTROL_IFACE_PATH;
+        args[2]="set_network";
+        args[3]="2";
+        args[4]="ssid";
+        args[5]=ssid;
+
+        printf("--ssid=%s\r\n",ssid);
+
+        printf("---wpa_cli_ssid---\r\n");
+        ret=command_System(6,args,"wpa_cli",NULL);
+
+       	args[0]="-p";
+        args[1]=CONTROL_IFACE_PATH;
+        args[2]="set_network";
+        args[3]="2";
+        args[4]="key_mgmt";
+        args[5]="NONE";
+        
+         printf("---wpa_cli_key_mgmt--NONE---\r\n");
+        ret=command_System(6,args,"wpa_cli",NULL);
+
+
+	return ret;
+}
+
+ 
 int connect_AP(const char* ssid,const char* psk)
 {
 	int  ret;
-	char ssid_wpa[100];
 	const char* args[] = {"-d","-Dnl80211","-c",SUPP_CONFIG_FILE,"-iwlan0","-B"};
 
-
+	printf("---wpa_supplicant---\r\n");
         ret=command_System(6,args,"wpa_supplicant",NULL);
 	
         args[0]="-p";
 	args[1]= CONTROL_IFACE_PATH;
 	args[2]="add_network";
-	args[3]= "0";
+	args[3]= "2";
 
+	printf("---wpa_cli_add_network---\r\n");
         ret=command_System(4,args,"wpa_cli",NULL);
-
-    	sprintf(ssid_wpa, "%s", "\"\'");
-
-	strcat(ssid_wpa,ssid);
-
-	strcat(ssid_wpa,"\'\"");
+	
+    	//sprintf(ssid_wpa, "%s", "\"");
+        //sprintf(ssid_wpa, "%s", "\'");
+	//strcat(ssid_wpa,ssid);
+	//strcat(ssid_wpa,"\'");
+       	//strcat(ssid_wpa,"\"");
 
 	args[0]="-p";
 	args[1]=CONTROL_IFACE_PATH;
-	args[2]="0";
-	args[3]="ssid";
-	args[4]=ssid_wpa;
+	args[2]="set_network";
+	args[3]="2";
+	args[4]="ssid";
+	args[5]=ssid;
+	
+	printf("--ssid=%s\r\n",ssid);
 
-        ret=command_System(5,args,"wpa_cli",NULL);
+        printf("---wpa_cli_ssid---\r\n");
+        ret=command_System(6,args,"wpa_cli",NULL);
+
+
+    	args[0]="-p";
+        args[1]=CONTROL_IFACE_PATH;
+        args[2]="set_network";
+        args[3]="2";
+        args[4]="key_mgmt";
+        args[5]="WPA-PSK";
+
+        printf("---wpa_cli_-key_mgmt WPA-PSK--\r\n");
+        ret=command_System(6,args,"wpa_cli",NULL);
+
+      	args[0]="-p";
+        args[1]=CONTROL_IFACE_PATH;
+        args[2]="set_network";
+        args[3]="2";
+        args[4]="proto";
+        args[5]="WPA";
+
+        printf("---wpa_cli_ssid	 proto WPA---\r\n");
+        ret=command_System(6,args,"wpa_cli",NULL);
+
+      	args[0]="-p";
+        args[1]=CONTROL_IFACE_PATH;
+        args[2]="set_network";
+        args[3]="2";
+        args[4]="pairwise";
+        args[5]="TKIP";
+
+        printf("---wpa_cli_pairwise TKIP---\r\n");
+        ret=command_System(6,args,"wpa_cli",NULL);
+
+
+
+      	args[0]="-p";
+        args[1]=CONTROL_IFACE_PATH;
+        args[2]="set_network";
+        args[3]="2";
+        args[4]="group";
+        args[5]="TKIP";
+
+        printf("---wpa_cli_group TKIP---\r\n");
+        ret=command_System(6,args,"wpa_cli",NULL);
+
+	//sprintf(psk_wpa, "%s", "\"");
+        //sprintf(psk_wpa, "%s", "\'");
+        //strcat(psk_wpa,psk);     
+        //strcat(psk_wpa,"\'");
+      	//sprintf(psk_wpa, "%s", "\"");
 
         args[0]="-p";
 	args[1]=CONTROL_IFACE_PATH;
-	args[2]="0";
-	args[3]="psk";
-	args[4]=psk;
+	args[2]="set_network";
+	args[3]="2";
+	args[4]="psk";
+	args[5]=psk;
 
-       ret=command_System(5,args,"wpa_cli",NULL);
+	printf("----psk=%s=----\r\n",psk);
 
+       printf("---wpa_cli_psk---\r\n");
+       ret=command_System(6,args,"wpa_cli",NULL);
+  	/*
    	args[0]="-p";
 	args[1]=CONTROL_IFACE_PATH;
 	args[2]="select_network";
-	args[3]="0";
+	args[3]="2";
 
+        printf("---wpa_cli_select_network---\r\n");
        ret=command_System(4,args,"wpa_cli",NULL);
-
+	*/
+	
    	args[0]="-p";
 	args[1]=CONTROL_IFACE_PATH;
 	args[2]="enable_network";
-	args[3]="0";
+	args[3]="2";
 
+        printf("---wpa_cli_enable_network---\r\n");
        ret=command_System(4,args,"wpa_cli",NULL);
 
 	args[0]="wlan0";
 
+        printf("---wpa_cli_DHCP_TOOL---\r\n");
 	ret=command_System(1,args,DHCP_TOOL,NULL);
+
+	//system("netcfg");
 	
 	return ret;
 }
@@ -163,7 +271,7 @@ int connect_AP(const char* ssid,const char* psk)
         
         args[]={"-iwlan0","add_network","0"};
 
-        ret=command_System(3,args,"wpa_ci",NULL);
+        ret=command_System(3,args,"wpa_cli",NULL);
 
         sprintf(ssid_wpa, "%s", "\"\'");
 
@@ -196,7 +304,7 @@ int connect_AP(const char* ssid,const char* psk)
 #endif
 
 
-int disconnect_AP(voi)
+int disconnect_AP(void)
 {
 	int ret;	
 	const char* args[30] = {"-ef | grep wpa_supplicant | awk '{print $2}' | xargs kill -9"};

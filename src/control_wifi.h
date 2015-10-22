@@ -10,13 +10,13 @@
 
 //it  depends on  "SUPP_CONFIG_FILE" 
 #define CONTROL_IFACE_PATH	   "/data/misc/wifi/wlan0"
-#define ANDROID
+//#define ANDROID
 //#define LINUX
 
 
 //tool
 //different platfrom requires different tool 
-#define  DHCP_TOOL  "dhpad"
+#define  DHCP_TOOL  "dhcpcd"
 
 
 
@@ -25,6 +25,7 @@ extern int  turn_On_Wifi(void) ;
 extern int  turn_Off_Wifi(void) ;
 extern int  search_Wifi_Spot(char * wifispot);
 extern int  connect_AP(const char* ssid,const char* psk) ;
+extern int  connect_AP_Open(const char*ssid);
 extern int  disconnect(void);
 extern int  clear_AP_History(void);
 
