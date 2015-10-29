@@ -14,6 +14,8 @@ int main(int argc, char *argv[])
 
 	search_Wifi_Spot(wifi_spot);	
 
+	printf("wifi_spot:\r\n%s",wifi_spot);
+
         usleep(1000000);                  //wait for one seconds 
 	
 	printf("----connect--ap--\r\n");

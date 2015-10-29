@@ -3,12 +3,12 @@
 
 int  command_System(int argcount,const char* args[],const char* binary_name,char* returndata,int inputcunt,const char * inputdata[])
 {
-        char myoutput_array[500];
-	char myinput_array[500];
+        char myoutput_array[500]={0};
+	char myinput_array[500]={0};
 	int i;
 	FILE *fp_r;
 	FILE *fp_w;
-        char path[1035];	
+        char path[1035]={0};	
 
 	
 	sprintf(myoutput_array, "%s", binary_name);
@@ -20,19 +20,19 @@ int  command_System(int argcount,const char* args[],const char* binary_name,char
 	  //      printf("--OOinput=%s\r\n",myoutput_array);
         }
 	
-	if(inputdata!=NULL)
-	{
-		sprintf(myinput_array, "%s", inputdata[0]);
+	//iif(inputdata!=NULL)
+	//{
+	//	sprintf(myinput_array, "%s", inputdata[0]);
 		//printf("--data[%d]=%s\r\n",0,inputdata[0]);	
-     		for(i = 1; i <inputcunt; ++i)
-        	{
+     	for(i = 0; i <inputcunt; ++i)
+        {
 		///	printf("--data[%d]=%s\r\n",i,inputdata[i]);
-   			strcat(myinput_array, " ");
-                	strcat(myinput_array, inputdata[i]);
+		strcat(myinput_array, inputdata[i]);   			
+		strcat(myinput_array, " ");
 		//	printf("--input=%s\r\n",myinput_array);
 
-        	}
-	}
+        }
+	//}
 
         /* Open the command for reading. */
 	
@@ -62,7 +62,7 @@ int  command_System(int argcount,const char* args[],const char* binary_name,char
 		/* Read the output a line at a time - output it. */
         	while (fgets(path, sizeof(path), fp_r) != NULL)
         	{
-                	printf("%s", path);
+                	//printf("%s", path);
 			strcat(returndata, path);
         	}
         	/* close */
@@ -232,6 +232,11 @@ int connect_AP(const char* ssid,const char* psk)
        ret=command_System(2,args,"wpa_cli",NULL,3,input);
 
         usleep(100000);
+
+        args[0] = DHCPCD_WLAN_PATH;
+
+        ret=command_System(1,args,"rm -rf",NULL,0,NULL);
+	
 
 	args[0]="wlan0";
 

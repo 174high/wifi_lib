@@ -8,8 +8,11 @@
 #define WIFI_DRIVER_MODULE_PATH   "/system/lib/modules/wlcore_sdio.ko"
 #define SUPP_CONFIG_FILE          "/data/misc/wifi/wpa_supplicant.conf"
 
+
 //it  depends on  "SUPP_CONFIG_FILE" 
 #define CONTROL_IFACE_PATH	   "/data/misc/wifi/wlan0"
+#define DHCPCD_WLAN_PATH           "/data/misc/dhcp/dhcpcd-wlan0.pid"
+
 //#define ANDROID
 //#define LINUX
 
@@ -19,8 +22,6 @@
 #define  DHCP_TOOL  "dhcpcd"
 
 
-
-extern int  command_System(int argcount,const char* args[],const char* binary_name,char* returndata,int inputcunt,const char * inputdata[]);
 
 extern int  turn_On_Wifi(void) ;
 extern int  turn_Off_Wifi(void) ;

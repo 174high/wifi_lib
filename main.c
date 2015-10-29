@@ -18,17 +18,9 @@ int main(int argc, char *argv[])
 	
 	printf("----connect--ap--\r\n");
 	
-	connect_AP_Open("\'\"H30-T10\"\'");
-	//wifi_ssid[0]='\'';
-	//wifi_ssid[1]='\"';
-	//wifi_ssid[2]='\"';
-	//wifi_ssid[3]='\'';
-	//wifi_psk[0]=;
-	
-	//wifi_ssid="\'\"Flaircommxiamen\"\'";
-	//printf("---wifi_ssid=%s-----",wifi_ssid);
+	//connect_AP("\"H30-T10\"",NULL);
 
-//	connect_AP("\'\"Flairmicro_XM\"\'","\'\"Flaircommxiamen\"\'");	
+	connect_AP("\"Flairmicro_XM\"","\"Flaircommxiamen\"");	
 
 //	usleep(1000000); 
 	
