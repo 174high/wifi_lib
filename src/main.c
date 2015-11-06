@@ -2,19 +2,15 @@
 
 int main(int argc, char *argv[])
 {
-	
-      	char wifi_spot[5000];
-	//char *wifi_ssid;
-	//char wifi_psk[100];
 
-       	turn_On_Wifi();
+       	FLC_Wifi_Turn_On_Wifi();
 
 	usleep(3000000); 			//wait for three seconds
 	//must wait for ,because insmoding  the driver  requires three seconds
 
-	search_Wifi_Spot(wifi_spot);	
+	FLC_Wifi_Client_Search_Wifi_Spot();	
 
-	printf("wifi_spot:\r\n%s",wifi_spot);
+	//printf("wifi_spot:\r\n%s",wifi_spot);
 
         usleep(1000000);                  //wait for one seconds 
 	
@@ -22,19 +18,19 @@ int main(int argc, char *argv[])
 	
 	//connect_AP("\"H30-T10\"",NULL);
 
-	connect_AP("\"Flairmicro_XM\"","\"Flaircommxiamen\"");	
+	FLC_Wifi_Client_Connect_AP("\"Flairmicro_XM\"","\"Flaircommxiamen\"");	
 
 //	usleep(1000000); 
 	
 //	printf("---disconnect_AP--\r\n");
 
-//	disconnect_AP();
+	//FLC_Wifi_Client_Disconnect_AP();
 	
 //	usleep(1000000);
 	
   //     printf("---turn_Off_Wifi--\r\n");
 
-//	turn_Off_Wifi();
+	//FLC_Wifi_Turn_Off_Wifi();
 	return 0 ;
 }
 

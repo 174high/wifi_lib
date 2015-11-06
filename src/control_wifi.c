@@ -1,6 +1,9 @@
 #include "control_wifi.h"
 
 
+
+
+
 int  command_System(int argcount,const char* args[],const char* binary_name,char* returndata,int inputcunt,const char * inputdata[])
 {
         char myoutput_array[500]={0};
@@ -13,32 +16,21 @@ int  command_System(int argcount,const char* args[],const char* binary_name,char
 	
 	sprintf(myoutput_array, "%s", binary_name);
         for(i = 0; i < argcount; ++i)
-        {
-	//	printf("--OOdata[%d]=%s\r\n",i,args[i]);
+      	{
                 strcat(myoutput_array, " ");
                 strcat(myoutput_array, args[i]);
-	  //      printf("--OOinput=%s\r\n",myoutput_array);
         }
 	
-	//iif(inputdata!=NULL)
-	//{
-	//	sprintf(myinput_array, "%s", inputdata[0]);
-		//printf("--data[%d]=%s\r\n",0,inputdata[0]);	
      	for(i = 0; i <inputcunt; ++i)
         {
-		///	printf("--data[%d]=%s\r\n",i,inputdata[i]);
 		strcat(myinput_array, inputdata[i]);   			
 		strcat(myinput_array, " ");
-		//	printf("--input=%s\r\n",myinput_array);
-
         }
-	//}
 
         /* Open the command for reading. */
 	
 	if(inputdata!=NULL)
 	{
-	 	//printf("aaaaaaaaaaaa");
 		if((fp_w = popen(myoutput_array, "w")) == NULL)
         	{
                         perror("Fail to popen w\n");
@@ -47,7 +39,6 @@ int  command_System(int argcount,const char* args[],const char* binary_name,char
 	}
 	else
 	{
-		//printf("bbbbbbbbbbbb");
 		if((fp_r=popen(myoutput_array, "r")) == NULL)
         	{
                 	perror("Failed to popen r\n" );
@@ -58,7 +49,6 @@ int  command_System(int argcount,const char* args[],const char* binary_name,char
 
         if(returndata!=NULL)
 	{	
-	//	printf("cccccccccc");
 		/* Read the output a line at a time - output it. */
         	while (fgets(path, sizeof(path), fp_r) != NULL)
         	{
@@ -71,7 +61,6 @@ int  command_System(int argcount,const char* args[],const char* binary_name,char
 
 	if(inputdata!=NULL)
 	{
-		//printf("ddddddddd\r\n");	
 		//printf("myinput=%s\r\n",myinput_array);
 		fputs(myinput_array,fp_w);
 		pclose(fp_w);
@@ -80,7 +69,7 @@ int  command_System(int argcount,const char* args[],const char* binary_name,char
 	return 0;
 }
 
-int  turn_On_Wifi(void)
+int  FLC_Wifi_Turn_On_Wifi(void)
 {	
 	int  ret;
 	const char* args[] = {WIFI_DRIVER_MODULE_PATH};
@@ -90,7 +79,7 @@ int  turn_On_Wifi(void)
 	return ret;
 }
 
-int  turn_Off_Wifi(void)
+int  FLC_Wifi_Turn_Off_Wifi(void)
 {
         int  ret;
         const char* args[] = {WIFI_DRIVER_MODULE_PATH};
@@ -100,12 +89,33 @@ int  turn_Off_Wifi(void)
 
 }
 
-int search_Wifi_Spot(char * wifispot)
+
+void init_wifi_spot(void)
+{
+	int i=0;
+	
+	for(i=0;i<20;i++)
+	{	
+		memset(wifi_info[i].ssid,0,sizeof(wifi_info[i].ssid));	
+		memset(wifi_info[i].signal,0,sizeof(wifi_info[i].signal));
+		strcpy(wifi_info[i].security,"open");
+	}
+
+}
+
+
+
+int FLC_Wifi_Client_Search_Wifi_Spot(void)
 {
      
 	int  ret;
+	char wifi_spot_data[5000];	
+	int i=0,j=0,k=0;
+        int spot_id=0;
 	
+
 	const char* args[30] = {"wlan0","up"};
+
 		
 	ret=command_System(2,args,"ifconfig",NULL,0,NULL);
 
@@ -115,16 +125,140 @@ int search_Wifi_Spot(char * wifispot)
 	args[3] = "-e SSID -e signal" ;
 	args[4] = "-e WPA  -e WEP" ;
 	args[5] = "-e Group  -e Pairwise -e Authentication ";
+	args[6] = "-e Extended supported";
 	
 
-        ret=command_System(6,args,"iw",wifispot,0,NULL);
+        ret=command_System(7,args,"iw",wifi_spot_data,0,NULL);
+
+/*
+	for(i=0;i<sizeof(wifi_spot_data)-20;i++)
+	{
+	
+	if(wifi_spot_data[i]=='s')
+        {
+        if(wifi_spot_data[i+1]=='i')
+        {
+        if(wifi_spot_data[i+2]=='g')
+        {
+        if(wifi_spot_data[i+3]=='n')
+        {
+        if(wifi_spot_data[i+4]=='a')
+        {
+        if(wifi_spot_data[i+5]=='l')
+        {
+       	if(wifi_spot_data[i+6]==':')
+        { 
+	if(wifi_spot_data[i+7]==' ')
+	{
+	j=0; 
+        while(wifi_spot_data[i+8]!=' ')
+        {
+        wifi_info[spot_id].signal[j]=wifi_spot_data[i+8];
+        i++;
+        j++;
+        }
+	i=i+8;
+
+	}
+	}
+	}
+	}
+	}
+	}
+	}
+	}
+
+	if(wifi_spot_data[i]=='s')
+	{
+	if(wifi_spot_data[i+1]=='s')
+	{
+	if(wifi_spot_data[i+2]=='i')
+	{
+	if(wifi_spot_data[i+3]=='d')
+	{
+	if(wifi_spot_data[i+4]==':')
+	{
+	if(wifi_spot_data[i+5]==' ')
+        {
+	j=0;
+	while(wifi_spot_data[i+6]!=' ')
+	{
+	wifi_info[spot_id].ssid[k]=wifi_spot_data[i+6];
+	i++;
+	k++;
+	}
+	i=i+6;
+							
+	}
+	}		
+	}
+	}
+	}	
+	}
+
+	if(wifi_spot_data[i]=='R')
+	{
+	if(wifi_spot_data[i+1]=='S')
+	{
+	if(wifi_spot_data[i+2]=='N')
+	{
+	strcpy(wifi_info[spot_id].security,"psk"); 		
+	}
+	}	
+	}
+	
+	if(wifi_spot_data[i]=='E')
+	{
+	if(wifi_spot_data[i+1]=='x')
+	{
+	if(wifi_spot_data[i+2]=='t')
+	{
+	if(wifi_spot_data[i+3]=='e')
+	{
+	if(wifi_spot_data[i+4]=='n')	
+	{
+	if(wifi_spot_data[i+5]=='d')
+	{
+	if(wifi_spot_data[i+6]=='e')
+	{
+	if(wifi_spot_data[i+7]==' ')
+	{
+	if(wifi_spot_data[i+8]=='s')
+	{
+	if(wifi_spot_data[i+9]=='u')
+	{
+	spot_id++;
+	i=i+9;
+	}
+	}
+	}
+	}
+	}
+	}
+	}
+	}
+	}
+	}
+	
+	}
+
+*/
+
 
         return ret;
 }
 
-int connect_AP(const char* ssid,const char* psk)
+int FLC_Wifi_Client_Connect_AP(const char* ssid,const char* psk)
 {
       	int  ret;
+	
+	int fd;
+	
+	char buffer[1000]={0};
+        
+	int i=0,j=0;
+
+       bool  store_ssid=true;	
 
         const char* args[] = {"-d","-Dnl80211","-c",SUPP_CONFIG_FILE,"-iwlan0","-B"};
 	const char* input[5];
@@ -148,7 +282,6 @@ int connect_AP(const char* ssid,const char* psk)
 	printf("recent_netowrk=%s\r\n",recent_network);
 //	delchar(recent_network,"Selected interface \'wlan0\'");
 	
-	unsigned char i=0;
 	
 	do
 	{	
@@ -177,6 +310,76 @@ int connect_AP(const char* ssid,const char* psk)
         printf("---wpa_cli_ssid---\r\n");
         ret=command_System(2,args,"wpa_cli",NULL,5,input);
 
+	//if((fp=fopen(SUPP_CONFIG_FILE,"w"))==NULL)
+	//{
+	//	printf("不能打开文件\n");
+	//	exit(0);
+	//}
+
+	fd=open(SUPP_CONFIG_FILE,O_RDONLY);
+
+	read(fd,buffer,sizeof(buffer));
+/*
+	for(i=0;i<sizeof(buffer)-20;i++)
+	{
+	if(buffer[i]=='s')
+	{
+        if(buffer[i+1]=='s')	
+	{
+	if(buffer[i+2]=='i')
+	{
+	if(buffer[i+3]=='d')
+	{
+      	if(buffer[i+4]=='=')
+        {	
+	
+	j=0;
+	while(1)
+	{	
+
+	if(buffer[i+5]==ssid[j])
+	{	
+	store_ssid=false;
+	}
+	else
+	{
+	store_ssid=true;
+	break;
+	}
+	i++;
+	j++;
+
+	if(ssid[j]=='"'||j>20)
+	{
+	
+		break;	
+	}
+
+	}
+
+	}
+
+
+	}
+	}			
+	}
+	}	
+
+	}
+
+	}
+*/
+	if(store_ssid==true)
+	{
+
+		//fd=open(SUPP_CONFIG_FILE, O_CREAT|O_WRONLY|O_APPEND);
+
+		write(fd,"network={\n",sizeof("network={\n")-1);
+       		write(fd,"	ssid=",sizeof("      ssid=")-1);
+		write(fd,ssid,sizeof(ssid)-1);
+		write(fd,"\n",sizeof("\n")-1);
+
+	}
 	usleep(10000);
 
 	if(psk==NULL)
@@ -192,6 +395,21 @@ int connect_AP(const char* ssid,const char* psk)
 
         	printf("---wpa_cli_key_mgmt--NONE---\r\n");
         	ret=command_System(2,args,"wpa_cli",NULL,5,input);
+
+		if(store_ssid==true)
+                {
+                	write(fd,"      key_mgmt=",sizeof("      key_mgmt=")-1);
+                	write(fd,"NONE",sizeof("NONE")-1);
+                	write(fd,"\n",sizeof("\n")-1);
+
+            		write(fd,"      priority=",sizeof("      priority=")-1);
+               		write(fd,"1",sizeof("1")-1);
+                	write(fd,"\n",sizeof("\n")-1);
+
+                	write(fd,"}",sizeof("}")-1);
+                	write(fd,"\n",sizeof("\n")-1);
+                }
+
 	}
 	else
 	{
@@ -207,7 +425,25 @@ int connect_AP(const char* ssid,const char* psk)
 
         	printf("---wpa_cli_psk---\r\n");
         	ret=command_System(2,args,"wpa_cli",NULL,5,input);
-       
+       	
+		if(store_ssid==true)
+        	{
+	       
+			write(fd,"      psk=",sizeof("      psk=")-1);
+        		write(fd,psk,sizeof(psk)-1);
+			write(fd,"\n",sizeof("\n")-1);
+
+            		write(fd,"      key_mgmt=",sizeof("      key_mgmt=")-1);
+                	write(fd,"psk",sizeof(psk)-1);
+                	write(fd,"\n",sizeof("\n")-1);
+
+			write(fd,"      priority=",sizeof("      priority=")-1);
+                	write(fd,"1",sizeof("1")-1);
+                	write(fd,"\n",sizeof("\n")-1);
+
+			write(fd,"}",sizeof("}")-1);
+                	write(fd,"\n",sizeof("\n")-1);
+		}
 	}
 
 	usleep(10000);
@@ -246,105 +482,9 @@ int connect_AP(const char* ssid,const char* psk)
 	return ret;
 }
 
-/*
-int connect_AP(const char* ssid,const char* psk)
-{
-	int  ret;
-	const char* args[] = {"-d","-Dnl80211","-c",SUPP_CONFIG_FILE,"-iwlan0","-B"};
-	const char* input[5];
-
-	printf("---wpa_supplicant---\r\n");
-        ret=command_System(6,args,"wpa_supplicant",NULL,0,NULL);
-      	
-	usleep(3000000);	
-        
-	args[0]="-p";
-	args[1]= CONTROL_IFACE_PATH;
-	input[0]="add_network";
-	input[1]="\r";
-
-	printf("---wpa_cli_add_network---\r\n");
-        ret=command_System(1,args,"wpa_cli",NULL,2,input);
-	
-       	usleep(10000);
-    	//sprintf(ssid_wpa, "%s", "\"");
-        //sprintf(ssid_wpa, "%s", "\'");
-	//strcat(ssid_wpa,ssid);
-	//strcat(ssid_wpa,"\'");
-       	//strcat(ssid_wpa,"\"");
-
-	args[0]="-p";
-	args[1]=CONTROL_IFACE_PATH;
-	input[0]="set_network";
-	input[1]="2";
-	input[2]="ssid";
-	input[3]=ssid;
-	input[4]="\r";	
-
-	printf("--ssid=%s\r\n",ssid);
-
-        printf("---wpa_cli_ssid---\r\n");
-        ret=command_System(2,args,"wpa_cli",NULL,5,input);
-      
-	usleep(10000);
-	//sprintf(psk_wpa, "%s", "\"");
-        //sprintf(psk_wpa, "%s", "\'");
-        //strcat(psk_wpa,psk);     
-        //strcat(psk_wpa,"\'");
-      	//sprintf(psk_wpa, "%s", "\"");
-
-        args[0]="-p";
-	args[1]=CONTROL_IFACE_PATH;
-	input[0]="set_network";
-	input[1]="2";
-	input[2]="psk";
-	input[3]=psk;
-	input[4]="\r";
-
-	printf("----psk=%s=----\r\n",psk);
-
-	printf("---wpa_cli_psk---\r\n");
-	ret=command_System(2,args,"wpa_cli",NULL,5,NULL);
-  	
-	usleep(10000);
-   	
-	args[0]="-p";
-	args[1]=CONTROL_IFACE_PATH;
-	input[0]="select_network";
-	input[1]="2";
-	input[2]="\r";
-
-        printf("---wpa_cli_select_network---\r\n");
-        ret=command_System(4,args,"wpa_cli",NULL,3,input);
-	usleep(10000);
-	
-   	args[0]="-p";
-	args[1]=CONTROL_IFACE_PATH;
-	input[0]="enable_network";
-	input[1]="2";
-	input[2]="\r";
-
-        printf("---wpa_cli_enable_network---\r\n");
-       ret=command_System(2,args,"wpa_cli",NULL,3,input);
-
-	usleep(10000);
-
-	args[0]="wlan0";
-
-        printf("---wpa_cli_DHCP_TOOL---\r\n");
-	ret=command_System(1,args,DHCP_TOOL,NULL,0,NULL);
-
-	usleep(10000);
-	//system("netcfg");
-	
-	return ret;
-}
 
 
-*/
-
-
-int disconnect_AP(void)
+int FLC_Wifi_Client_Disconnect_AP(void)
 {
 	int ret;	
 	const char* args[30] = {"-ef | grep wpa_supplicant | awk '{print $2}' | xargs kill -9"};
@@ -364,12 +504,45 @@ int disconnect_AP(void)
 	return ret;
 }
 
-int clear_AP_History(void)
+int FLC_Wifi_Client_Clear_AP_History(void)
 {
-	int ret;	
+	int ret,i;
+	int fd;	
 	const char* args[] = {SUPP_CONFIG_FILE};
+	char buffer[5000];
 	
-	ret=command_System(1,args,"rm -rf",NULL,0,NULL);
+
+	fd=open(SUPP_CONFIG_FILE, O_CREAT|O_WRONLY|O_APPEND);
+
+        read(fd,buffer,sizeof(buffer));
+
+        for(i=0;i<sizeof(buffer)-10;i++)
+        {
+        if(buffer[i]=='n')
+        {
+        if(buffer[i+1]=='e')
+        {
+        if(buffer[i+2]=='t')
+        {
+        if(buffer[i+3]=='w')
+        {
+        if(buffer[i+4]=='o')
+        {
+      	if(buffer[i+5]=='r')
+	{
+	if(buffer[i+6]=='k')
+        {	        
+                write(fd,buffer,(ssize_t)i);
+                // printf("----%s-----",buffer);
+               break;
+        }
+	}
+	}
+	}
+	}
+	}
+	}
+	}
 	
 	return ret;
 }
